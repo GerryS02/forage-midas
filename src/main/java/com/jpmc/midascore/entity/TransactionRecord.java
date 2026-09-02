@@ -18,6 +18,15 @@ public class TransactionRecord {
     private UserRecord recipient;
 
     private double amount;
+    private float incentive;
+
+    public float getIncentive(){
+        return incentive;
+    }
+
+    public void setIncentive(float incentive){
+        this.incentive = incentive;
+    }
 
     public TransactionRecord() {}
 

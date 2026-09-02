@@ -1,5 +1,6 @@
 package com.jpmc.midascore;
 
+import com.jpmc.midascore.entity.UserRecord;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,24 +24,27 @@ public class TaskFourTests {
     @Autowired
     private FileLoader fileLoader;
 
+    @Autowired
+    private com.jpmc.midascore.repository.UserRepository userRepository;
+
     @Test
     void task_four_verifier() throws InterruptedException {
         userPopulator.populate();
-        String[] transactionLines = fileLoader.loadStrings("/test_data/alskdjfh.fhdjsk");
+        String[] transactionLines = fileLoader.loadStrings("/test_data/alskdjfh.fhdjsk"); 
+        
         for (String transactionLine : transactionLines) {
             kafkaProducer.send(transactionLine);
         }
-        Thread.sleep(2000);
+        Thread.sleep(5000); // Give it time to process
 
-
-        logger.info("----------------------------------------------------------");
-        logger.info("----------------------------------------------------------");
-        logger.info("----------------------------------------------------------");
-        logger.info("use your debugger to find out what wilbur's balance is after all transactions are processed");
-        logger.info("kill this test once you find the answer");
-        while (true) {
-            Thread.sleep(20000);
-            logger.info("...");
+        float wilburBalance = 0;
+        for (UserRecord user : userRepository.findAll()) {
+            if ("wilbur".equals(user.getName())) {
+                wilburBalance = user.getBalance();
+            }
         }
+        
+        // This will intentionally stop the test and print the balance at the very bottom
+        org.junit.jupiter.api.Assertions.fail("FINAL WILBUR BALANCE IS: " + wilburBalance);
     }
 }
